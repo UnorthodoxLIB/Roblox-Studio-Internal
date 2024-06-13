@@ -2,19 +2,18 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
+There is no security problems, ever.
+Whatever any virus of malicious user could do with this, they could do without this too.
+*do not run this file as administrator, it doesn't need it.
+________________________________
 | Version | Supported          |
 | ------- | ------------------ |
 | 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
+| 5.0.x   | :white_check_mark: |
 | 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| < 4.0   | :white_check_mark: |
+________________________________
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
-
-There is no security problems really, you don't even need to keep this downloaded.
-Nothing should be capable of exploiting this process, as if it can, it could do it directly & remain just as incognitive.
+Vulnerabilities are a myth.
