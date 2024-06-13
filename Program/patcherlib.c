@@ -5,7 +5,7 @@
 // This library isn't to be used yet, & will only be available one day.
 // Added alot of comments to make this more user friendly, since I got some complaints with the old, sorry!
 
-static _ = "Copyright (c) 2024 UnorthodoxLIB\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files(the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and /or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions :\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.";
+static const char *_ = "Copyright (c) 2024 UnorthodoxLIB\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files(the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and /or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions :\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.";
 
 #include "patcherlib.h"
 
@@ -30,15 +30,12 @@ inline void mcp(void* dest, const void* src, long n) {
     for (e = 0; e < n; e++) { d[e] = s[e]; }
 }
 
-char signaturesEndpoint[] = "/path/to/signatures"; // endpoint signature target.
-char patchesEndpoint[] = "/path/to/patches"; // endpoint patch target.
-char githubDomain[] = "github.com"; // github domain name.
 
 // BR = BytesRead, i = index, wsa = wsa initiated.
 unsigned __int8 br = 0, wsa = 0;
 
 static WSADATA wsaData; // WSA Data stuff
-static char httpBuffer[5]; // Buffer of 5 characters, so it reads 0x00, then the next from there. Simply removing the , in the program makes this function a-ok.
+static char httpBuffer[4]; // Buffer of 5 characters, so it reads 0x00, then the next from there. Simply removing the , in the program makes this function a-ok.
 
 static struct sockaddr_in ghsa;
 
@@ -53,13 +50,6 @@ FILE* bi, * bo;
 // s = FileSize, i = Index, o = Offset.
 long s = 0, i = 0, o = 0;
 
-// sets GHSA's values, & gets github's IP.
-static inline void updateGHSA() {
-    ghsa.sin_family = AF_INET;
-    ghsa.sin_port = htons(80);
-    ghsa.sin_addr.s_addr = *(unsigned __int32*)gethostbyname(githubDomain)->h_addr_list[0];
-}
-
 // initializes WSA, & gets the valid github data. Then assures the function wont update again if called again.
 static inline int initWsa() {
     if (wsa == 0) {
@@ -67,80 +57,92 @@ static inline int initWsa() {
         {
             return -1;
         }
-        updateGHSA();
         wsa = 1;
     }
     return 0;
 }
 
+// simple get function. Original method was lower level, but it turns out github doesn't like responding to it.
+
+struct MemoryStruct {
+    char* memory;
+    size_t size;
+};
+
+static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+    size_t realsize = size * nmemb;
+    struct MemoryStruct* mem = (struct MemoryStruct*)userp;
+
+    char* ptr = realloc(mem->memory, mem->size + realsize + 1);
+    if (ptr == NULL) {
+        // out of memory!
+        printf("not enough memory (realloc returned NULL)\n");
+        return 0;
+    }
+
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+
+    return realsize;
+}
+
+char* httpGetSync(const char* url) {
+    CURL* curl_handle;
+    CURLcode res;
+
+    struct MemoryStruct chunk;
+
+    chunk.memory = malloc(1);
+    chunk.size = 0;
+
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl_handle = curl_easy_init();
+
+    curl_easy_setopt(curl_handle, CURLOPT_URL, url);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void*)&chunk);
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "robloxinternal-agent/1.0");
+    res = curl_easy_perform(curl_handle);
+
+    if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        free(chunk.memory);
+        chunk.memory = NULL;
+    }
+
+    curl_easy_cleanup(curl_handle);
+
+    curl_global_cleanup();
+    return chunk.memory;
+}
 // updates signatures.
 inline void updatePatcherSignatures() {
-    if (initWsa() != 0) return;
+    static char signaturesEndpoint[] = "https://raw.githubusercontent.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/master/Update/signatures.hex";
 
-    SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket == INVALID_SOCKET) {
-        WSACleanup();
-        return;
-    }
-
-    if (connect(clientSocket, (struct sockaddr*)&ghsa, sizeof(ghsa)) == -1) {
-        closesocket(clientSocket);
-        WSACleanup();
-        return;
-    }
-
-    char getRequest[256];
-    snprintf(getRequest, sizeof(getRequest), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", signaturesEndpoint, githubDomain);
-    send(clientSocket, getRequest, strlen(getRequest), 0);
-
-    i = 0;
-    while ((br = recv(clientSocket, httpBuffer, sizeof(httpBuffer), 0)) > 0) {
-        for (int j = 0; j < br; j++) {
-            toPatch[i++] = httpBuffer[j];
-            if (i >= sizeof(toPatch)) break;
-        }
-    }
-
-    closesocket(clientSocket);
-    WSACleanup();
+    const char* stuff = httpGetSync(&signaturesEndpoint);
+    printf("Response: ");
+    printf("%s",(char*)stuff);
+    printf("\n");
+    return;
 }
 
 // updates patch data.
 inline void updatePatcherPatches() {
-    if (initWsa() != 0) return;
+    static char patchesEndpoint[] = "https://raw.githubusercontent.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/master/Update/patches.hex"; // endpoint signature target.
+    const char* stuff = httpGetSync(&patchesEndpoint);
 
-    SOCKET clientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clientSocket == INVALID_SOCKET) {
-        WSACleanup();
-        return;
-    }
-
-    if (connect(clientSocket, (struct sockaddr*)&ghsa, sizeof(ghsa)) == -1) {
-        closesocket(clientSocket);
-        WSACleanup();
-        return;
-    }
-
-    char getRequest[256];
-    snprintf(getRequest, sizeof(getRequest), "GET %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", patchesEndpoint, githubDomain);
-    send(clientSocket, getRequest, strlen(getRequest), 0);
-
-    i = 0;
-    while ((br = recv(clientSocket, httpBuffer, sizeof(httpBuffer), 0)) > 0) {
-        for (int j = 0; j < br; j++) {
-            toPatch[i++] = httpBuffer[j];
-            if (i >= sizeof(toPatch)) break;
-        }
-    }
-
-    closesocket(clientSocket);
-    WSACleanup();
+    printf("Response: ");
+    printf("%s", (char*)stuff);
+    printf("\n");
+    return;
 }
 
 // updates I guess?
 inline void updatePatcherData() {
     updatePatcherSignatures();
-    updatePatcherPatches();
+    //updatePatcherPatches();
 }
 
 // Patches.
