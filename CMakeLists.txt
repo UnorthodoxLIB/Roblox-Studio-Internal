@@ -1,4 +1,9 @@
-﻿# CMakeList.txt : CMake project for RobloxStudioPatcher, include source and define
+﻿
+# YOU REQUIRE VCPKG FOR:
+# Program/patcherlib
+# Program/smartpatcher
+
+# CMakeList.txt : CMake project for RobloxStudioPatcher, include source and define
 # project specific logic here.
 #
 cmake_minimum_required (VERSION 3.8)
