@@ -1,0 +1,6 @@
+C:/Users/keega/source/repos/RobloxStudioPatcher/CMakeFiles/RobloxStudioPatcher.dir
+C:/Users/keega/source/repos/RobloxStudioPatcher/CMakeFiles/OptiStudioPatcher.dir
+C:/Users/keega/source/repos/RobloxStudioPatcher/CMakeFiles/SmartPatcher.dir
+C:/Users/keega/source/repos/RobloxStudioPatcher/CMakeFiles/PatcherLib.dir
+C:/Users/keega/source/repos/RobloxStudioPatcher/CMakeFiles/ALL_BUILD.dir
+C:/Users/keega/source/repos/RobloxStudioPatcher/CMakeFiles/ZERO_CHECK.dir
