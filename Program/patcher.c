@@ -3,6 +3,7 @@ const unsigned char signatures[]={0x41,0x38,0x9e,0x78,0x01,0x00,0x00,0x74,0x05,0
                        toPatch[]={0x41,0x38,0x9e,0x78,0x01,0x00,0x00,0x90,0x90,0xe8};
 unsigned char binary[140*1024*1024];
 long i,o,s,e;FILE*bi,*bo;
+
 inline __int8 mco(const void* s1, const void* s2, size_t n) {
     const unsigned char* p1 = (const unsigned char*)s1;
     const unsigned char* p2 = (const unsigned char*)s2;
