@@ -1,7 +1,8 @@
 Roblox Studio Patcher.
 
-For it to function, simply drag the executable in the same folder as RobloxStudioBeta.exe & run it.
-From here, a new executable named "RobloxStudioInternal.exe" will be made, Running this executable will start Roblox Studio normally but with internal enabled.
+This simply clones roblox studio, & creates a new one named "RobloxStudioInternal.exe" of which has Internal patched.
 
-I don't know who flagged this as evil, but it isn't mane its literally 30 lines of code :sob:
-pls stop
+In order to use the Executable, simply drag any version of it into the same directory as RobloxStudioBeta.exe & run said executable, this should start the process I explained just before this.
+
+This isn't a virus, it's quite literally 9.5kb, & 30 lines long.
+I'm pretty sure Winsock would make this use more than 9.5kb.
