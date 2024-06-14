@@ -1,5 +1,7 @@
 #pragma once
 
+#define CURL_STATICLIB
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

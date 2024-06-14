@@ -104,6 +104,7 @@ char* httpGetSync(const char* url) {
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void*)&chunk);
     curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "robloxinternal-agent/1.0");
+
     res = curl_easy_perform(curl_handle);
 
     if (res != CURLE_OK) {
@@ -117,12 +118,35 @@ char* httpGetSync(const char* url) {
     curl_global_cleanup();
     return chunk.memory;
 }
+
+// array updator
+static inline void updateArray(unsigned char* Array, unsigned char* Apple)
+{
+    static unsigned char AppleOX[40];
+    static unsigned __int8 i;
+    static unsigned __int8 i2;
+
+
+    for (i = 0; i < sizeof(*Apple); i+=4, i2++)
+    {
+        const char Num[4] = { Apple[i], Apple[i+1], Apple[i+2], Apple[i+3] };
+        AppleOX[i2] = (char)strtol(&Num, NULL, 16);
+    }
+
+    for (i = 0; i < 10; i++)
+    {
+        Array[i] = AppleOX[i];
+    };
+}
 // updates signatures.
 inline void updatePatcherSignatures() {
     static char signaturesEndpoint[] = "https://raw.githubusercontent.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/master/Update/signatures.hex";
 
     const char* stuff = httpGetSync(&signaturesEndpoint);
-    printf("Response: ");
+
+    updateArray(signatures, stuff);
+
+    printf("Response SIG: ");
     printf("%s",(char*)stuff);
     printf("\n");
     return;
@@ -133,7 +157,9 @@ inline void updatePatcherPatches() {
     static char patchesEndpoint[] = "https://raw.githubusercontent.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/master/Update/patches.hex"; // endpoint signature target.
     const char* stuff = httpGetSync(&patchesEndpoint);
 
-    printf("Response: ");
+    updateArray(toPatch, stuff);
+
+    printf("Response PTC: ");
     printf("%s", (char*)stuff);
     printf("\n");
     return;
@@ -142,7 +168,7 @@ inline void updatePatcherPatches() {
 // updates I guess?
 inline void updatePatcherData() {
     updatePatcherSignatures();
-    //updatePatcherPatches();
+    updatePatcherPatches();
 }
 
 // Patches.
