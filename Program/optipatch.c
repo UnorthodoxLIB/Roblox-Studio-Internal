@@ -6,7 +6,7 @@ unsigned char binary[140 * 1024 * 1024];
 long i, o, s, e;
 HANDLE bi, bo;
 void* v = 0;
-inline __int8 mco(const void* s1, const void* s2, size_t n) {
+inline char mco(const void* s1, const void* s2, size_t n) {
     const unsigned char* p1 = (const unsigned char*)s1;
     const unsigned char* p2 = (const unsigned char*)s2;
     for (e = 0; e < n; e++) { if (p1[e] != p2[e]) { return(p1[e] < p2[e]) ? -1 : 1; } }

@@ -16,7 +16,7 @@ unsigned char signatures[] = { 0x41,0x38,0x9e,0x78,0x01,0x00,0x00,0x74,0x05,0xe8
 
 // Compares two arrays.
 static long e; // E is only used for the iterator in mco & mcp, to provide a more "static" memory use.
-inline __int8 mco(const void* s1, const void* s2, long n) {
+inline char mco(const void* s1, const void* s2, long n) {
     const unsigned char* p1 = (const unsigned char*)s1;
     const unsigned char* p2 = (const unsigned char*)s2;
     for (e = 0; e < n; e++) { if (p1[e] != p2[e]) { return(p1[e] < p2[e]) ? -1 : 1; } }
@@ -32,7 +32,7 @@ inline void mcp(void* dest, const void* src, long n) {
 
 
 // BR = BytesRead, i = index, wsa = wsa initiated.
-unsigned __int8 br = 0, wsa = 0;
+unsigned char br = 0, wsa = 0;
 
 static WSADATA wsaData; // WSA Data stuff
 static char httpBuffer[4]; // Buffer of 5 characters, so it reads 0x00, then the next from there. Simply removing the , in the program makes this function a-ok.
@@ -123,8 +123,8 @@ char* httpGetSync(const char* url) {
 static inline void updateArray(unsigned char* Array, unsigned char* Apple)
 {
     static unsigned char AppleOX[40];
-    static unsigned __int8 i;
-    static unsigned __int8 i2;
+    static unsigned char i;
+    static unsigned char i2;
 
 
     for (i = 0; i < sizeof(*Apple); i+=4, i2++)
@@ -172,9 +172,14 @@ inline void updatePatcherData() {
 }
 
 // Patches.
-inline void PatchStudio(const char* studioPath,const char* createInternalAt) 
+inline char PatchStudio(const char* studioPath,const char* createInternalAt) 
 {
     bi = fopen(studioPath, "rb"); bo = fopen(createInternalAt, "wb");
+    if (bi==NULL)
+        return 1;
+    else if (bo==NULL)
+        return 2;
+
     fseek(bi, 0, SEEK_END); // moves the pointer.
     s = ftell(bi); // sets filesize to size of bi.
     fseek(bi, 0, SEEK_SET); // moves the pointer.
@@ -183,6 +188,8 @@ inline void PatchStudio(const char* studioPath,const char* createInternalAt)
     mcp(&binary[o], toPatch, sizeof(toPatch)); // Copies data from toPatch to binary, at the index [o] (starting from)
     fwrite(&binary, 1, s, bo); // Writes
     fclose(bi); fclose(bo); // closes files.
+
+    return 0;
 }
 
 /*

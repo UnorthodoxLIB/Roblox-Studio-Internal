@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/keega/source/repos/RobloxStudioPatcher
+# Install script for directory: C:/Users/____/source/repos/RobloxStudioPatcher
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

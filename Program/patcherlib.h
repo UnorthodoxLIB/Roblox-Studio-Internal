@@ -18,4 +18,4 @@ void updatePatcherPatches();
 // Updates patcher data (Signatures & Patches)
 void updatePatcherData();
 // Patches studio, studio path being the path to RobloxStudioBeta.exe, createInternalAt being where you want the file to be created, & what you want its name to be.
-void PatchStudio(const char* studioPath,const char* createInternalAt);
+char PatchStudio(const char* studioPath,const char* createInternalAt);
