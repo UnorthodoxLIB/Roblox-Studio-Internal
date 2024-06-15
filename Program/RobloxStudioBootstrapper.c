@@ -61,17 +61,7 @@ void extract_zip(const char *zip_path, const char *dest_dir) {
     zip_close(zip_archive);
 }
 
-int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <zipfile> <destination>\n", argv[0]);
-        return 1;
-    }
-
-    const char *zip_path = argv[1];
-    const char *dest_dir = argv[2];
-
-    extract_zip(zip_path, dest_dir);
-
-    printf("Installation completed successfully.\n");
-    return 0;
+int main() 
+{
+    printf("This will come to be, another day.");
 }
