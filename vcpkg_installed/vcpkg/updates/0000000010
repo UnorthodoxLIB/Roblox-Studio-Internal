@@ -1,0 +1,6 @@
+Package: libzip
+Feature: default-aes
+Architecture: x64-windows
+Multi-Arch: same
+Description: Use default AES
+Status: install ok installed
