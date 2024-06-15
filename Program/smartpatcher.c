@@ -2,7 +2,7 @@
 
 int main()
 {
-	char cerr = 0;
+	static char cerr = 0;
 
 	printf("Copyright (c) 2024 UnorthodoxLIB\n"
     "Permission is hereby granted, free of charge, to any person obtaining a copy\n"
@@ -49,6 +49,7 @@ int main()
 	}
 error:
 	printf("An error occured & Studio probably wasn't patched.\nFor help, visit https://github.com/unorthodoxlib/roblox-studio-internal-patcher\nPress enter to close this window.\n");
+	getchar();
 	return cerr;
 finish:
 	printf("Press enter to close.");
