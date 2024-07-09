@@ -1,5 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 
+#Settings (Set properly!)
+set(VCPKG_PATH "P:/vcpkg")
+
 # Enable Hot Reload for MSVC compilers if supported.
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
@@ -8,24 +11,20 @@ endif()
 
 # Project Reference.
 project("RobloxStudioPatcher")
-# --> YOU MIGHT NOT NEED THE BELOW, IF FAILS UNCOMMENT (Assure the proper variables are set.)
-#include("{$VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake")
-#set(CMAKE_TOOLCHAIN_FILE "{$VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake")
 
-# Packages.
-find_package(CURL CONFIG REQUIRED)
+# VCPKG Setup.
+set(STATIC_VCPKG_INCLUDE_PATH "${VCPKG_PATH}/installed/x64-windows-static/include")
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_PATH}/scripts/buildsystems/vcpkg.cmake")
+
+message(STATUS "VCPKG: ${VCPKG_PATH}")
+message(STATUS "VCPKGINC: ${STATIC_VCPKG_INCLUDE_PATH}")
+message(STATUS "TOOLCHAIN: ${CMAKE_TOOLCHAIN_FILE}")
 
 # Create Programs
 add_executable(RobloxStudioPatcher "Program/patcher.c")
 add_executable(OptiStudioPatcher "Program/optipatch.c")
 add_executable(SmartPatcher "Program/smartpatcher.c")
 add_library(PatcherLib "Program/patcherlib.c")
-
-# Link libraries
-target_link_libraries(RobloxStudioPatcher)
-target_link_libraries(OptiStudioPatcher)
-target_link_libraries(SmartPatcher PRIVATE CURL::libcurl)
-target_link_libraries(PatcherLib PRIVATE CURL::libcurl)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET RobloxStudioPatcher PROPERTY CXX_STANDARD 20)

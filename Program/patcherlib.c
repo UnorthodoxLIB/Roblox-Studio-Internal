@@ -1,3 +1,4 @@
+#pragma once
 // This is a library for easy, high-level use of the patcher.
 // This is intended to be easily used, & not require routine updating.
 // This library should be used Synchronously, parallel calls may cause catastrophic error.
@@ -8,10 +9,9 @@
 static const char *_ = "Copyright (c) 2024 UnorthodoxLIB\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files(the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and /or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions :\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.";
 
 #include "patcherlib.h"
-
 // statically defined stuff for signatures & topatch. If this is outdated, it still serves to function as an allocator & initializer.
-unsigned char signatures[] = { 0x41,0x38,0x9e,0x78,0x01,0x00,0x00,0x74,0x05,0xe8 },
-                 toPatch[] = { 0x41,0x38,0x9e,0x78,0x01,0x00,0x00,0x90,0x90,0xe8 };
+unsigned char signatures[] = { 0x41,0x38,0x9e,0x78,0x01,0x00,0x02,0x44,0x05,0xFF },
+                 toPatch[] = { 0x41,0x38,0x9e,0x78,0x01,0x00,0x02,0x20,0xAA,0xf8 };
 
 
 // Compares two arrays.
@@ -140,28 +140,21 @@ static inline void updateArray(unsigned char* Array, unsigned char* Apple)
 }
 // updates signatures.
 inline void updatePatcherSignatures() {
-    static char signaturesEndpoint[] = "https://raw.githubusercontent.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/master/Update/signatures.hex";
+    static char signaturesEndpoint[] = "https://github.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/raw/master/Update/signatures.hex";
 
     const char* stuff = httpGetSync(&signaturesEndpoint);
 
-    updateArray(signatures, stuff);
-
-    printf("Response SIG: ");
-    printf("%s",(char*)stuff);
-    printf("\n");
+    updateArray(&signatures, stuff);
     return;
 }
 
-// updates patch data.
+// updates patch data.patches.hex
 inline void updatePatcherPatches() {
-    static char patchesEndpoint[] = "https://raw.githubusercontent.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/master/Update/patches.hex"; // endpoint signature target.
+    static char patchesEndpoint[] = "https://github.com/UnorthodoxLIB/Roblox-Studio-Internal-Patcher/raw/master/Update/patches.hex"; // endpoint signature target.
     const char* stuff = httpGetSync(&patchesEndpoint);
 
-    updateArray(toPatch, stuff);
+    updateArray(&toPatch, stuff);
 
-    printf("Response PTC: ");
-    printf("%s", (char*)stuff);
-    printf("\n");
     return;
 }
 
@@ -172,9 +165,14 @@ inline void updatePatcherData() {
 }
 
 // Patches.
-inline void PatchStudio(const char* studioPath,const char* createInternalAt) 
+inline unsigned char PatchStudio(const char* studioPath,const char* createInternalAt) 
 {
     bi = fopen(studioPath, "rb"); bo = fopen(createInternalAt, "wb");
+    if (bi == NULL)
+        return 0b00000001;
+    if (bo == NULL)
+        return 0b00000010;
+
     fseek(bi, 0, SEEK_END); // moves the pointer.
     s = ftell(bi); // sets filesize to size of bi.
     fseek(bi, 0, SEEK_SET); // moves the pointer.
@@ -183,6 +181,8 @@ inline void PatchStudio(const char* studioPath,const char* createInternalAt)
     mcp(&binary[o], toPatch, sizeof(toPatch)); // Copies data from toPatch to binary, at the index [o] (starting from)
     fwrite(&binary, 1, s, bo); // Writes
     fclose(bi); fclose(bo); // closes files.
+
+    return 0;
 }
 
 /*
