@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #pragma once
 // This is a library for easy, high-level use of the patcher.
 // This is intended to be easily used, & not require routine updating.
@@ -192,3 +193,6 @@ This doesn't mean it is actually inlined, but rather it may be inlined based on 
 TODO
 Finish the program later.
 */
+=======
+#include "patcherlib.h"
+>>>>>>> ec172efb65ad64322f94a32342619ac1e81f427d

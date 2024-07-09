@@ -1,0 +1,7 @@
+Package: libzip
+Feature: bzip2
+Depends: bzip2
+Architecture: x64-windows
+Multi-Arch: same
+Description: Support bzip2-compressed zip archives
+Status: install ok half-installed

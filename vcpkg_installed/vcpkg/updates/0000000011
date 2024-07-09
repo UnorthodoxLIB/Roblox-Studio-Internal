@@ -1,0 +1,6 @@
+Package: libzip
+Feature: wincrypto
+Architecture: x64-windows
+Multi-Arch: same
+Description: AES (encryption) support using Windows Crypto API
+Status: install ok installed

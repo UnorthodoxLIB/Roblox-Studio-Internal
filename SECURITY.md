@@ -1,19 +1,6 @@
 # Security Policy
 
-## Supported Versions
-
-There is no security problems, ever.
-Whatever any virus of malicious user could do with this, they could do without this too.
-*do not run this file as administrator, it doesn't need it.
-________________________________
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :white_check_mark: |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :white_check_mark: |
-________________________________
-
-## Reporting a Vulnerability
-
-Vulnerabilities are a myth.
+There should be absolutely no security problems whatsoever!
+It is a basic patcher, however if you have concerns feel free to take it up on the forums.
+-->
+All changes to Sigs, & their cooresponding patches will be reviewed, & tested before being accepted.
